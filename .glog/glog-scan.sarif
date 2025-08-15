@@ -1,0 +1,473 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Glog.AI",
+          "organization": "Glog.AI",
+          "fullName": "Glog, Making software more secure",
+          "version": "1.0.0",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://www.glog.ai",
+          "rules": [
+            {
+              "id": "glog-2b0bd136-1a20-4b81-9011-ddaa9452a821",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `shell=True` argument in the `subprocess.Popen()` function in Python is a security vulnerability. It allows shell injection, which is a type of attack where an attacker can execute arbitrary commands on the host operating system. This can lead to serious security breaches, such as unauthorized access, data theft, or even denial of service.\n\nThe vulnerability arises when the `shell=True` argument is used in combination with user-supplied input. This can allow an attacker to inject malicious commands, which will be executed by the shell.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid using `shell=True` whenever possible, especially when dealing with user-supplied input. Instead, use `shell=False` and pass the command and its arguments as a list.\n\nIf you must use `shell=True`, make sure to properly sanitize and validate all user-supplied input. This can help prevent shell injection attacks.\n\n## Source Code Fix Recommendation\n\nHere is a fixed version of the code:\n\n```python\nimport subprocess\n\ncmd_str = ['command', 'arg1', 'arg2']\nprocesses.append(subprocess.Popen(cmd_str, stdout=subprocess.DEVNULL))\n```\n\nIn this version, `shell=True` is removed and the command and its arguments are passed as a list.\n\n## Library Dependencies\n\nThe code example requires the `subprocess` library, which is included in the standard Python library.\n\n## OWASP and CWE Links\n\n- [OWASP Command Injection](https://owasp.org/www-community/attacks/Command_Injection)\n- [CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')](https://cwe.mitre.org/data/definitions/78.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B602"
+                ]
+              }
+            },
+            {
+              "id": "glog-52d4c12e-6d85-4363-8957-f99e27eb1f46",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe \"Vulnerability in URL Audit for Permitted Schemes\" in Python refers to a situation where an application does not properly validate the scheme of a URL before using it to perform actions. This can lead to various security issues such as remote file inclusion (RFI), local file inclusion (LFI), and server-side request forgery (SSRF). \n\nIn Python, the `urlopen()` function from the `urllib.request` module is often used to open URLs. However, it does not validate the scheme of the URL, which can lead to the aforementioned security issues if the URL is controlled by an attacker.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to always validate the scheme of a URL before using it. This can be done by using a regular expression or by using the `urlparse()` function from the `urllib.parse` module to parse the URL and check its scheme.\n\n## Source Code Fix Recommendation\n\nHere is an example of how to validate the scheme of a URL before using it with `urlopen()`:\n\n```python\nfrom urllib.parse import urlparse\nfrom urllib.request import urlopen\n\ndef safe_urlopen(url):\n    parsed_url = urlparse(url)\n    if parsed_url.scheme not in ['http', 'https']:\n        raise ValueError('Invalid URL scheme')\n    with urlopen(url) as response:\n        return response.read()\n```\n\nIn this example, the `safe_urlopen()` function first parses the URL and checks its scheme. If the scheme is not 'http' or 'https', it raises a `ValueError`. Otherwise, it opens the URL and returns the response.\n\n## Library Dependencies\n\nThe code example requires the following Python standard library modules:\n\n- `urllib.parse`\n- `urllib.request`\n\n## References\n\n- [CWE-918: Server-Side Request Forgery (SSRF)](https://cwe.mitre.org/data/definitions/918.html)\n- [CWE-23: Relative Path Traversal](https://cwe.mitre.org/data/definitions/23.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B310"
+                ]
+              }
+            },
+            {
+              "id": "glog-3231928a-c872-4b61-86c4-08320577e363",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe \"Vulnerability in URL Audit for Permitted Schemes\" in Python refers to a situation where an application does not properly validate the scheme of a URL before using it to retrieve data. This can lead to various security issues such as SSRF (Server Side Request Forgery), where an attacker can make requests to internal resources, or remote file inclusion, where an attacker can cause the application to include a file from a remote server.\n\nIn the provided code snippet, the `urlretrieve` function from the `urllib` library is used to download a file from a specified URL. If the URL is not properly validated, an attacker could potentially provide a URL with a malicious scheme (like `file://` or `ftp://`), leading to unintended behavior.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to always validate URLs before using them to retrieve data. This includes checking the scheme of the URL to ensure it is one of the expected schemes (typically `http` or `https`). \n\n## Source Code Fix Recommendation\n\nHere is a simple way to validate the URL scheme before using `urlretrieve`:\n\n```python\nfrom urllib.parse import urlparse\nimport urllib.request\n\ndef is_valid_url(url):\n    try:\n        result = urlparse(url)\n        return all([result.scheme, result.netloc])\n    except ValueError:\n        return False\n\nurl = \"http://example.com\"\nif is_valid_url(url) and urlparse(url).scheme in ['http', 'https']:\n    urllib.request.urlretrieve(url, filepath, reporthook=t.update_to)\nelse:\n    print(\"Invalid or unsafe URL\")\n```\n\nIn this code, the `is_valid_url` function checks if the URL is valid and if the scheme is either `http` or `https`. If the URL is not valid or the scheme is not one of the permitted ones, the code will not attempt to retrieve the file.\n\n## Library Dependencies\n\nThe code example requires the following Python standard libraries:\n\n- `urllib.parse`\n- `urllib.request`\n\n## References\n\n- [OWASP - Unvalidated Redirects and Forwards Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html)\n- [CWE-918: Server-Side Request Forgery (SSRF)](https://cwe.mitre.org/data/definitions/918.html)\n- [CWE-610: Externally Controlled Reference to a Resource in Another Sphere](https://cwe.mitre.org/data/definitions/610.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B310"
+                ]
+              }
+            },
+            {
+              "id": "glog-7168ba0a-d753-4d9c-8e8f-b9630c91fd2d",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `tarfile.extractall` method in Python's `tarfile` module is used to extract all members of the archive to the current working directory or to a directory specified as a parameter. If this method is used without validating the contents of the tar file, it can lead to a path traversal attack. This happens when an attacker is able to control the contents of the tar file and includes files with pathnames that escape the intended directory structure. When the tar file is extracted, these files can overwrite important files or be placed in sensitive locations, leading to a potential security vulnerability.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should validate the contents of the tar file before extracting it. This can be done by checking each file's path in the tar file to ensure it does not contain directory traversal sequences (like \"../\"). You should also ensure that the resulting path is within the intended output directory.\n\n## Source Code Fix Recommendation\n\nHere is a way to safely extract a tar file in Python:\n\n```python\nimport os\nimport tarfile\n\ndef safe_extractall(tar_file, output_dir):\n    for member in tar_file.getmembers():\n        # Ensure that the file path is within the output directory\n        if os.path.commonprefix([output_dir, os.path.abspath(os.path.join(output_dir, member.name))]) != output_dir:\n            raise ValueError(f\"Tar file contains invalid path: {member.name}\")\n    tar_file.extractall(output_dir)\n```\n\nIn this code, `os.path.commonprefix` is used to check if the resulting file path is within the output directory. If it is not, a `ValueError` is raised.\n\n## Library Dependencies\n\nThe code example requires the `os` and `tarfile` modules, which are both part of the Python Standard Library.\n\n## References\n\n- [OWASP - Path Traversal](https://owasp.org/www-community/attacks/Path_Traversal)\n- [CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')](https://cwe.mitre.org/data/definitions/22.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B202"
+                ]
+              }
+            },
+            {
+              "id": "glog-036a9ae5-a810-4726-a322-17bb18acfd7a",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nUntrusted Data Deserialization Vulnerability in Pickle Modules is a security vulnerability in Python programming language. It occurs when an application deserializes data from an untrusted source without proper validation. The `pickle` module in Python is used for serializing and deserializing objects, which can be exploited by an attacker to execute arbitrary code, if the data being deserialized is from an untrusted source.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to avoid deserializing data from untrusted sources. If it is necessary to deserialize data, use safe, built-in Python libraries like `json` or `yaml` that do not allow arbitrary code execution. \n\n## Source Code Fix Recommendation\n\nInstead of using `pickle.loads()`, use `json.loads()` or `yaml.safe_load()` for deserializing data. Here is an example:\n\n```python\nimport json\n\ndata = json.loads(data_bytes)\n```\n\n## Library Dependencies\n\nThe code example requires the `json` library which is built-in in Python and does not need to be installed separately.\n\n## References\n\n- [OWASP Python Security - Deserialization](https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html#python)\n- [CWE-502: Deserialization of Untrusted Data](https://cwe.mitre.org/data/definitions/502.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B301"
+                ]
+              }
+            },
+            {
+              "id": "glog-168f7746-c72f-47f8-833f-e5fd88599665",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `tarfile.extractall` method in Python's `tarfile` module is used to extract all members of the archive to the current working directory or to a directory specified by `path`. If used without proper validation, it can lead to a path traversal vulnerability. This happens when an attacker can control the names of the files in the tar archive, and those names include relative paths. If the application extracts the archive without validating the file names, it could overwrite important files or execute code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should validate the names of the files in the tar archive before extracting them. You should reject file names that include relative paths or that start with a `/` character. You should also consider using a secure directory to extract the files, and ensure that the application does not have write access to sensitive directories.\n\n## Source Code Fix Recommendation\n\nHere is a simple way to validate the file names in a tar archive before extracting them:\n\n```python\nimport tarfile\nimport os\n\ndef safe_extractall(tar, path):\n    for member in tar.getmembers():\n        # Check for relative paths\n        if '..' in member.name or member.name.startswith('/'):\n            raise ValueError(\"Unsafe file name in tar archive: \" + member.name)\n        tar.extract(member, path)\n\nwith tarfile.open(filepath) as tar:\n    safe_extractall(tar, output_dir)\n```\n\n## Library Dependencies\n\nThe code example requires the `tarfile` and `os` modules, which are both part of the Python Standard Library.\n\n## References\n\n- [OWASP Path Traversal](https://owasp.org/www-community/attacks/Path_Traversal)\n- [CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')](https://cwe.mitre.org/data/definitions/22.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B202"
+                ]
+              }
+            },
+            {
+              "id": "glog-cd2b1a0d-5ece-49ed-a0be-0ca92cbcaef4",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `urlretrieve(url, filepath)` function in Python's `urllib` library is used to retrieve a file from a given URL and store it in a local file. This function is vulnerable to a security issue known as \"Vulnerability in URL Audit for Permitted Schemes\". This vulnerability occurs when the function is used to retrieve a file from a URL that uses a scheme that is not intended to be allowed. An attacker could exploit this vulnerability by providing a URL that uses a scheme that allows them to execute arbitrary code or access sensitive information.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should validate the URL before passing it to the `urlretrieve` function. Specifically, you should check that the scheme of the URL is one of the schemes that you intend to allow. For example, if you only intend to allow URLs that use the `http` or `https` schemes, you should reject any URL that uses a different scheme.\n\n## Source Code Fix Recommendation\n\nHere is an example of how you can validate the URL before passing it to the `urlretrieve` function:\n\n```python\nfrom urllib.parse import urlparse\nfrom urllib.request import urlretrieve\n\ndef safe_urlretrieve(url, filepath):\n    scheme = urlparse(url).scheme\n    if scheme not in ['http', 'https']:\n        raise ValueError('Invalid URL scheme: {}'.format(scheme))\n    urlretrieve(url, filepath)\n```\n\nIn this example, the `safe_urlretrieve` function first parses the URL to get its scheme. If the scheme is not `http` or `https`, the function raises a `ValueError`. Otherwise, it calls the `urlretrieve` function.\n\n## Library Dependencies\n\nThe code example requires the following Python standard library modules:\n\n- `urllib.parse`\n- `urllib.request`\n\n## References\n\n- [CWE-918: Server-Side Request Forgery (SSRF)](https://cwe.mitre.org/data/definitions/918.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing."
+              },
+              "properties": {
+                "tags": [
+                  "B310"
+                ]
+              }
+            },
+            {
+              "id": "glog-42dfa099-b58a-46aa-870a-941b47cf5cd3",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nUntrusted Data Deserialization Vulnerability in Pickle Modules is a critical security vulnerability in Python. The `pickle` module in Python is used for serializing and deserializing Python object structures. However, it is not safe to deserialize data that comes from an untrusted or unauthenticated source. The `pickle.loads()` function can execute arbitrary code during deserialization, which can lead to serious security issues like remote code execution (RCE) if the serialized data is tampered with.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should avoid deserializing data from untrusted sources. If you need to serialize and deserialize data, consider using safer methods like JSON or XML. These formats are less flexible than `pickle`, but they are also less likely to lead to arbitrary code execution.\n\n## Source Code Fix Recommendation\n\nReplace the `pickle` module with the `json` module. Here is how you can do it:\n\n```python\nimport json\n\n# Serialize\nalgo_str = json.dumps(algo)\n\n# Deserialize\nalgo = json.loads(algo_str)\n```\n\n## Library Dependencies\n\nThe code example requires the `pickle` module, which is included in the Python Standard Library, so no additional dependencies are needed.\n\n## References\n\n- [OWASP Python Security - Deserialization](https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html#python)\n- [CWE-502: Deserialization of Untrusted Data](https://cwe.mitre.org/data/definitions/502.html)"
+              },
+              "properties": {
+                "tags": [
+                  "B301"
+                ]
+              }
+            },
+            {
+              "id": "glog-59cd8d9f-3dbf-493b-a536-59af849523b0",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `Unsafe YAML Load Vulnerability` in Python is a security flaw that occurs when the `load()` function of the PyYAML library is used. This function can execute arbitrary Python commands embedded in the YAML input, leading to a potential remote code execution vulnerability if the input is from an untrusted source.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use the `safe_load()` function instead of `load()`. The `safe_load()` function only deserializes simple Python objects and does not execute any arbitrary code.\n\n## Source Code Fix Recommendation\n\nHere is the fixed version of the provided code:\n\n```python\nreturn yaml.safe_load(f, CheckKeyDuplicatesYamlLoader, **kwargs)  # type: ignore[no-any-return]\n```\n\n## Library Dependencies\n\nThe code example requires the following library:\n\n- PyYAML\n\n## References\n\n- [OWASP Python Security - Deserialization](https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html#python)\n- [CWE-502: Deserialization of Untrusted Data](https://cwe.mitre.org/data/definitions/502.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "B506"
+                ]
+              }
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "glog-2b0bd136-1a20-4b81-9011-ddaa9452a821",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "\"Shell=True Subprocess Call Security Vulnerability Detected\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/apps/nnunet/nnunetv2_runner.py"
+                },
+                "region": {
+                  "startLine": 688,
+                  "startColumn": 34,
+                  "endLine": 688,
+                  "endColumn": 98,
+                  "snippet": {
+                    "text": "                processes.append(subprocess.Popen(cmd_str, shell=True, stdout=subprocess.DEVNULL))\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 687,
+                  "endLine": 689,
+                  "snippet": {
+                    "text": "                logger.info(f\"Current running command on GPU device {device_id}:\\n{cmd_str}\\n\")\n                processes.append(subprocess.Popen(cmd_str, shell=True, stdout=subprocess.DEVNULL))\n            # finish this stage first\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "HIGH",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-52d4c12e-6d85-4363-8957-f99e27eb1f46",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Vulnerability in URL Audit for Permitted Schemes\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/apps/utils.py"
+                },
+                "region": {
+                  "startLine": 208,
+                  "startColumn": 22,
+                  "endLine": 208,
+                  "endColumn": 34,
+                  "snippet": {
+                    "text": "                with urlopen(url) as response:\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 207,
+                  "endLine": 209,
+                  "snippet": {
+                    "text": "            elif urlparse(url).netloc == \"cloud-api.yandex.net\":\n                with urlopen(url) as response:\n                    code = response.getcode()\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-3231928a-c872-4b61-86c4-08320577e363",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Vulnerability in URL Audit for Permitted Schemes\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/apps/utils.py"
+                },
+                "region": {
+                  "startLine": 112,
+                  "startColumn": 17,
+                  "endLine": 112,
+                  "endColumn": 67,
+                  "snippet": {
+                    "text": "                urlretrieve(url, filepath, reporthook=t.update_to)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 111,
+                  "endLine": 113,
+                  "snippet": {
+                    "text": "            with TqdmUpTo(unit=\"B\", unit_scale=True, unit_divisor=1024, miniters=1, desc=_basename(filepath)) as t:\n                urlretrieve(url, filepath, reporthook=t.update_to)\n        else:\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-7168ba0a-d753-4d9c-8e8f-b9630c91fd2d",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Unvalidated tarfile.extractall Usage Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/apps/utils.py"
+                },
+                "region": {
+                  "startLine": 289,
+                  "startColumn": 9,
+                  "endLine": 289,
+                  "endColumn": 40,
+                  "snippet": {
+                    "text": "        tar_file.extractall(output_dir)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 288,
+                  "endLine": 290,
+                  "snippet": {
+                    "text": "        tar_file = tarfile.open(filepath)\n        tar_file.extractall(output_dir)\n        tar_file.close()\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "HIGH",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-036a9ae5-a810-4726-a322-17bb18acfd7a",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Untrusted Data Deserialization Vulnerability in Pickle Modules"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/auto3dseg/utils.py"
+                },
+                "region": {
+                  "startLine": 321,
+                  "startColumn": 12,
+                  "endLine": 321,
+                  "endColumn": 36,
+                  "snippet": {
+                    "text": "    data = pickle.loads(data_bytes)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 320,
+                  "endLine": 322,
+                  "snippet": {
+                    "text": "        data_bytes = f_pi.read()\n    data = pickle.loads(data_bytes)\n\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-168f7746-c72f-47f8-833f-e5fd88599665",
+          "kind": "fail",
+          "level": "error",
+          "message": {
+            "text": "Unvalidated tarfile.extractall usage vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/apps/utils.py"
+                },
+                "region": {
+                  "startLine": 329,
+                  "startColumn": 9,
+                  "endLine": 329,
+                  "endColumn": 101,
+                  "snippet": {
+                    "text": "        extractall(filepath=filename, output_dir=output_dir, file_type=file_type, has_base=has_base)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 328,
+                  "endLine": 329,
+                  "snippet": {
+                    "text": "        download_url(url=url, filepath=filename, hash_val=hash_val, hash_type=hash_type, progress=progress)\n        extractall(filepath=filename, output_dir=output_dir, file_type=file_type, has_base=has_base)\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "HIGH",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-cd2b1a0d-5ece-49ed-a0be-0ca92cbcaef4",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Vulnerability in URL Audit for Permitted Schemes\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/apps/utils.py"
+                },
+                "region": {
+                  "startLine": 116,
+                  "startColumn": 13,
+                  "endLine": 116,
+                  "endColumn": 39,
+                  "snippet": {
+                    "text": "            urlretrieve(url, filepath)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 115,
+                  "endLine": 117,
+                  "snippet": {
+                    "text": "                warnings.warn(\"tqdm is not installed, will not show the downloading progress bar.\")\n            urlretrieve(url, filepath)\n    except (URLError, HTTPError, ContentTooShortError, OSError) as e:\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-42dfa099-b58a-46aa-870a-941b47cf5cd3",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Untrusted Data Deserialization Vulnerability in Pickle Modules\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/auto3dseg/utils.py"
+                },
+                "region": {
+                  "startLine": 356,
+                  "startColumn": 24,
+                  "endLine": 356,
+                  "endColumn": 48,
+                  "snippet": {
+                    "text": "                algo = pickle.loads(algo_bytes)\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 355,
+                  "endLine": 357,
+                  "snippet": {
+                    "text": "                sys.path.append(p)\n                algo = pickle.loads(algo_bytes)\n                break\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        },
+        {
+          "ruleId": "glog-59cd8d9f-3dbf-493b-a536-59af849523b0",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Unsafe YAML Load Vulnerability"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "monai/bundle/config_parser.py"
+                },
+                "region": {
+                  "startLine": 405,
+                  "startColumn": 24,
+                  "endLine": 405,
+                  "endColumn": 76,
+                  "snippet": {
+                    "text": "                return yaml.load(f, CheckKeyDuplicatesYamlLoader, **kwargs)  # type: ignore[no-any-return]\n"
+                  }
+                },
+                "contextRegion": {
+                  "startLine": 404,
+                  "endLine": 406,
+                  "snippet": {
+                    "text": "            if _filepath.lower().endswith(cls.suffixes[1:]):\n                return yaml.load(f, CheckKeyDuplicatesYamlLoader, **kwargs)  # type: ignore[no-any-return]\n            raise ValueError(f\"only support JSON or YAML config file so far, got name {_filepath}.\")\n"
+                  }
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_severity": "MEDIUM",
+            "issue_confidence": "HIGH"
+          }
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}
